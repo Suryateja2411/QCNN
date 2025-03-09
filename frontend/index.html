@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum CNN Training</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .progress {
+            width: 100%;
+            background: #ddd;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+            display: none;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background: #007bff;
+            transition: width 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Quantum CNN Training</h2>
+        <input type="file" id="fileInput">
+        <button id="uploadBtn" onclick="uploadFile()">Upload & Train</button>
+        <div class="progress" id="progressBarContainer">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <p id="accuracy"></p>
+    </div>
+
+    <script>
+        function uploadFile() {
+            const fileInput = document.getElementById("fileInput");
+            const uploadBtn = document.getElementById("uploadBtn");
+            const progressBarContainer = document.getElementById("progressBarContainer");
+            const progressBar = document.getElementById("progressBar");
+            const accuracyText = document.getElementById("accuracy");
+
+            if (!fileInput.files.length) return;
+            
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append("file", file);
+
+            uploadBtn.disabled = true;
+            progressBarContainer.style.display = "block";
+            progressBar.style.width = "50%"; // Simulate progress
+
+            fetch("http://localhost:5000/upload", {
+                method: "POST",
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                progressBar.style.width = "100%";
+                accuracyText.innerText = `Test Accuracy: ${data.accuracy}%`;
+            })
+            .catch(error => {
+                console.error("Error uploading file:", error);
+                accuracyText.innerText = "Error during upload";
+            })
+            .finally(() => {
+                uploadBtn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>
